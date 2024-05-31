@@ -1,36 +1,64 @@
-import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
+import { AutoCrud } from '@vaadin/hilla-react-crud';
 import { useSignal } from '@vaadin/hilla-react-signals';
-import { Button } from '@vaadin/react-components/Button.js';
-import { Notification } from '@vaadin/react-components/Notification.js';
-import { TextField } from '@vaadin/react-components/TextField.js';
-import { HelloWorldService } from 'Frontend/generated/endpoints.js';
+import { GridColumn, MultiSelectComboBox, TextField } from '@vaadin/react-components';
+import Item from 'Frontend/generated/com/example/application/entities/Item';
+import ItemModel from 'Frontend/generated/com/example/application/entities/ItemModel';
+import Label from 'Frontend/generated/com/example/application/entities/Label';
+import Matcher from 'Frontend/generated/com/vaadin/hilla/crud/filter/PropertyStringFilter/Matcher';
+import { ItemService, LabelService } from 'Frontend/generated/endpoints';
+import { useEffect } from 'react';
 
-export const config: ViewConfig = {
-  menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
-  title: 'Hello World',
-};
+export default function ItemsView() {
+  const labels = useSignal<Label[]>([]);
 
-export default function HelloWorldView() {
-  const name = useSignal('');
+  useEffect(() => {
+    LabelService.getLabels().then((value) => (labels.value = value))
+  }, [])
 
   return (
-    <>
-      <section className="flex p-m gap-m items-end">
-        <TextField
-          label="Your name"
-          onValueChanged={(e) => {
-            name.value = e.detail.value;
-          }}
-        />
-        <Button
-          onClick={async () => {
-            const serverResponse = await HelloWorldService.sayHello(name.value);
-            Notification.show(serverResponse);
-          }}
-        >
-          Say hello
-        </Button>
-      </section>
-    </>
+    <AutoCrud 
+      model={ItemModel} 
+      service={ItemService} 
+      gridProps={{
+        visibleColumns: ['name', 'labels'],
+        customColumns: [
+          <GridColumn
+            key="labels"
+            header="Labels"
+            autoWidth
+            renderer={({ item }: { item: Item }) => {
+              const { labels } = item;
+              return <span>{labels?.map((l) => l?.value).join(", ")}</span>;
+            }}
+          />,
+        ],
+        columnOptions: {
+          labels: {
+            headerFilterRenderer: ({ setFilter }) => (
+              <TextField
+                theme='small'
+                placeholder='Filter...'
+                onValueChanged={({ detail: { value } }) =>
+                  setFilter({
+                    propertyId: "labels.value",
+                    filterValue: value,
+                    matcher: Matcher.CONTAINS,
+                    "@type": "propertyString",
+                  })
+                }
+              />
+            ),
+          },
+        }
+      }}
+      formProps={{
+        visibleFields: ['name', 'labels'],
+        fieldOptions: {
+          labels: {
+            renderer: ({ field }) => <MultiSelectComboBox {...field} items={labels.value} itemIdPath="id" itemValuePath="value" itemLabelPath="value" />,
+          }
+        }
+      }}
+    />
   );
 }

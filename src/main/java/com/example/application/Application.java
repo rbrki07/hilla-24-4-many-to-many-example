@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-@Theme(value = "hilla-24-4-one-to-many-example")
+@Theme(value = "hilla-24-4-many-to-many-example")
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {

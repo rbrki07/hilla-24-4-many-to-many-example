@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Project from https://start.vaadin.com/project/a916930b-a2e6-454a-8589-628363c5690f -->
     <groupId>com.example.application</groupId>
-    <artifactId>hilla-24-4-one-to-many-example</artifactId>
-    <name>hilla-24-4-one-to-many-example</name>
+    <artifactId>hilla-24-4-many-to-many-example</artifactId>
+    <name>hilla-24-4-many-to-many-example</name>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -67,7 +67,14 @@
             <version>2.0.0</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
